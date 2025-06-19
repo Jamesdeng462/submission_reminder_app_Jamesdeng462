@@ -52,8 +52,16 @@ cd submission_reminder_[YourName]
 ### Adding More Students
 Edit the `data/submissions.txt` file in your application directory:
 ```
-StudentID,Name,Email,Assignment,Status
-S011,New,new@gmail.com,Bash Permissions,Pending
+student, assignment, submission status
+Chinemerem, Shell Navigation, not submitted
+Chiagoziem, Git, submitted
+Divine, Shell Navigation, not submitted
+Anissa, Shell Basics, submitted
+Michael, Shell Navigation, not submitted
+Sarah, Shell Navigation, submitted
+James, Shell Navigation, not submitted
+Emma, Git, submitted
+Alex, Shell Navigation, not submitted
 ```
 
 ## File Structure
@@ -64,7 +72,7 @@ submission_reminder_[YourName]/
 ├── modules/
 │   ├── functions.sh        # Helper functions
 │   └── reminder.sh         # Main reminder logic
-├── data/
+├── assets/
 │   └── submissions.txt     # Student submission records
 └── startup.sh              # Application startup script
 ```
