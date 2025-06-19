@@ -53,7 +53,7 @@ cd submission_reminder_[YourName]
 Edit the `data/submissions.txt` file in your application directory:
 ```
 StudentID,Name,Email,Assignment,Status
-S011,New Student,new@gmail.com,Bash Permissions,Pending
+S011,New,new@gmail.com,Bash Permissions,Pending
 ```
 
 ## File Structure
