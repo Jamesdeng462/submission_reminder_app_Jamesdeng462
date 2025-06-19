@@ -57,4 +57,3 @@ echo
 # Change to app directory and run startup script
 cd "$app_dir"
 ./startup.sh
-
