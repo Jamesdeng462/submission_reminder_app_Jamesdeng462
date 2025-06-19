@@ -22,7 +22,7 @@ A Linux-based application that helps track and remind students about pending ass
    ```
 
 2. **Run the environment setup**
-   ``
+   ```
    ./create_environment.sh
    ```
    - Enter your name when prompted
