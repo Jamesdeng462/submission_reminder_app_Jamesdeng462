@@ -38,7 +38,7 @@ mkdir -p config modules data
 echo "Creating config/config.env..."
 cat > config/config.env << 'EOF'
 APP_NAME="Student Submission Reminder"
-ASSIGNMENT="Math Assignment 1"
+ASSIGNMENT="Bash Permissions"
 REMINDER_MESSAGE="Please submit your assignment before the deadline!"
 LOG_LEVEL="INFO"
 EMAIL_ENABLED=false
