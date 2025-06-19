@@ -30,153 +30,79 @@ fi
 mkdir "$app_dir"
 cd "$app_dir"
 
-# Create subdirectories
+# Create subdirectories based on the provided structure
 echo "Creating subdirectories..."
-mkdir -p config modules data
+mkdir -p config modules assets
 
-# Create config/config.env
+# Create config/config.env (exactly as provided)
 echo "Creating config/config.env..."
 cat > config/config.env << 'EOF'
-APP_NAME="Student Submission Reminder"
-ASSIGNMENT="Shell Permissions"
-REMINDER_MESSAGE="Please submit your assignment before the deadline!"
-LOG_LEVEL="INFO"
-EMAIL_ENABLED=false
+# This is the config file
+ASSIGNMENT="Shell Navigation"
+DAYS_REMAINING=2
 EOF
 
-# Create modules/functions.sh
+# Create modules/functions.sh (exactly as provided)
 echo "Creating modules/functions.sh..."
 cat > modules/functions.sh << 'EOF'
 #!/bin/bash
 
-# Functions for submission reminder app
+# Function to read submissions file and output students who have not submitted
+function check_submissions {
+    local submissions_file=$1
+    echo "Checking submissions in $submissions_file"
 
-# Function to load configuration
-load_config() {
-    if [[ -f "config/config.env" ]]; then
-        source config/config.env
-        echo "Configuration loaded successfully"
-    else
-        echo "Error: Configuration file not found!"
-        exit 1
-    fi
-}
+    # Skip the header and iterate through the lines
+    while IFS=, read -r student assignment status; do
+        # Remove leading and trailing whitespace
+        student=$(echo "$student" | xargs)
+        assignment=$(echo "$assignment" | xargs)
+        status=$(echo "$status" | xargs)
 
-# Function to check if submissions file exists
-check_submissions_file() {
-    if [[ ! -f "data/submissions.txt" ]]; then
-        echo "Error: submissions.txt file not found!"
-        exit 1
-    fi
-}
-
-# Function to display pending submissions
-show_pending_submissions() {
-    local assignment="$1"
-    echo "=== Students with pending submissions for: $assignment ==="
-    echo
-    
-    while IFS=',' read -r student_id name email assignment_name status; do
-        # Skip header line
-        if [[ "$student_id" == "StudentID" ]]; then
-            continue
+        # Check if assignment matches and status is 'not submitted'
+        if [[ "$assignment" == "$ASSIGNMENT" && "$status" == "not submitted" ]]; then
+            echo "Reminder: $student has not submitted the $ASSIGNMENT assignment!"
         fi
-        
-        # Check if assignment matches and status is pending
-        if [[ "$assignment_name" == "$assignment" && "$status" == "Pending" ]]; then
-            echo "Student ID: $student_id"
-            echo "Name: $name"
-            echo "Email: $email"
-            echo "Status: $status"
-            echo "---"
-        fi
-    done < data/submissions.txt
-}
-
-# Function to count pending submissions
-count_pending() {
-    local assignment="$1"
-    local count=0
-    
-    while IFS=',' read -r student_id name email assignment_name status; do
-        if [[ "$student_id" == "StudentID" ]]; then
-            continue
-        fi
-        
-        if [[ "$assignment_name" == "$assignment" && "$status" == "Pending" ]]; then
-            ((count++))
-        fi
-    done < data/submissions.txt
-    
-    echo "$count"
+    done < <(tail -n +2 "$submissions_file") # Skip the header
 }
 EOF
 
-# Create modules/reminder.sh
+# Create modules/reminder.sh (exactly as provided)
 echo "Creating modules/reminder.sh..."
 cat > modules/reminder.sh << 'EOF'
 #!/bin/bash
 
-# Main reminder script
+# Source environment variables and helper functions
+source ./config/config.env
+source ./modules/functions.sh
 
-# Source functions
-source modules/functions.sh
+# Path to the submissions file
+submissions_file="./assets/submissions.txt"
 
-# Main reminder function
-run_reminder() {
-    echo "Starting Submission Reminder Application..."
-    echo
-    
-    # Load configuration
-    load_config
-    
-    # Check if submissions file exists
-    check_submissions_file
-    
-    # Display app info
-    echo "Application: $APP_NAME"
-    echo "Current Assignment: $ASSIGNMENT"
-    echo
-    
-    # Show pending submissions
-    show_pending_submissions "$ASSIGNMENT"
-    
-    # Show summary
-    local pending_count=$(count_pending "$ASSIGNMENT")
-    echo
-    echo "=== Summary ==="
-    echo "Total students with pending submissions: $pending_count"
-    
-    if [[ $pending_count -gt 0 ]]; then
-        echo "Reminder: $REMINDER_MESSAGE"
-    else
-        echo "Great! All students have submitted their assignments."
-    fi
-}
+# Print remaining time and run the reminder function
+echo "Assignment: $ASSIGNMENT"
+echo "Days remaining to submit: $DAYS_REMAINING days"
+echo "--------------------------------------------"
 
-# Run the reminder if script is executed directly
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    run_reminder
-fi
+check_submissions $submissions_file
 EOF
 
-# Create data/submissions.txt with sample data
-echo "Creating data/submissions.txt..."
-cat > data/submissions.txt << 'EOF'
-StudentID,Name,Email,Assignment,Status
-S001,Deng,deng@gmail.com,Shell Basics,Pending
-S002,Sarah,sarah@gmail.com,Shell Basics,Submitted
-S003,Mike,mike@gmail.com,Shell Permissions,Pending
-S004,Lisa,lisa@gmail.com,Shell I/O Redirections and filters,Submitted
-S005,Tom,tom@gmail.com,Shell Basics,Pending
-S006,Emma,emma@gmail.com,Shell Permissions,Pending
-S007,James,james@gmail.com,Shell Permissions,Submitted
-S008,Amy,amy@gmail.com,Shell I/O Redirections and filters,Pending
-S009,David,david@gmail.com,Shell Permissions,Submitted
-S010,Jennifer,jennifer@gmail.com,Shell Basics,Pending
+# Create assets/submissions.txt with original data plus 5 more students
+echo "Creating assets/submissions.txt..."
+cat > assets/submissions.txt << 'EOF'
+student, assignment, submission status
+Chinemerem, Shell Navigation, not submitted
+Chiagoziem, Git, submitted
+Divine, Shell Navigation, not submitted
+Anissa, Shell Basics, submitted
+Michael, Shell Navigation, not submitted
+Sarah, Shell Navigation, submitted
+James, Shell Navigation, not submitted
+Emma, Git, submitted
+Alex, Shell Navigation, not submitted
 EOF
 
-# Create startup.sh
+# Create startup.sh (you need to implement this)
 echo "Creating startup.sh..."
 cat > startup.sh << 'EOF'
 #!/bin/bash
@@ -192,14 +118,14 @@ echo "========================================="
 echo
 
 # Check if we're in the right directory
-if [[ ! -d "config" || ! -d "modules" || ! -d "data" ]]; then
+if [[ ! -d "config" || ! -d "modules" || ! -d "assets" ]]; then
     echo "Error: Please run this script from the application root directory"
-    echo "Make sure you have the following directories: config, modules, data"
+    echo "Make sure you have the following directories: config, modules, assets"
     exit 1
 fi
 
 # Check if all required files exist
-required_files=("config/config.env" "modules/functions.sh" "modules/reminder.sh" "data/submissions.txt")
+required_files=("config/config.env" "modules/functions.sh" "modules/reminder.sh" "assets/submissions.txt")
 
 for file in "${required_files[@]}"; do
     if [[ ! -f "$file" ]]; then
@@ -222,7 +148,7 @@ EOF
 
 # Make all .sh files executable
 echo "Setting executable permissions for .sh files..."
-chmod +x *.sh modules/*.sh
+find . -name "*.sh" -type f -exec chmod +x {} \;
 
 echo
 echo "=== Environment Setup Complete! ==="
