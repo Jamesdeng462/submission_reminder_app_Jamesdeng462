@@ -1,4 +1,3 @@
-```
 # Submission Reminder Application
 
 A Linux-based application that helps track and remind students about pending assignment submissions.
